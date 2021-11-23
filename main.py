@@ -10,9 +10,16 @@ WORK_MIN = 25
 SHORT_BREAK_MIN = 5
 LONG_BREAK_MIN = 20
 reps = 0
+timer = None
 
 # ---------------------------- TIMER RESET ------------------------------- # 
-
+def reset_timer():
+    window.after_cancel(timer)
+    canvas.itemconfig(timer_text, text = "00:00")
+    titlelabel.config(text="Timer", fg=GREEN, font=(FONT_NAME, 40, "bold"), bg=YELLOW, highlightthickness=0)
+    check_mark.config(text="")
+    global reps
+    reps = 0
 # ---------------------------- TIMER MECHANISM ------------------------------- # 
 def start_timer():
 
@@ -38,9 +45,15 @@ def count_down(count):
         count_sec = f"0{count_sec}"
     canvas.itemconfig(timer_text, text=f"{count_min}:{count_sec}")
     if(count>0):
-        window.after(1000, count_down, count-1)
+        global timer
+        timer = window.after(1000, count_down, count-1)
     else:
         start_timer()
+        marks = ""
+        work_sessions = floor(reps/2)
+        for i in range(work_sessions):
+            marks = marks + "✔"
+        check_mark.config(text=marks)
 # ---------------------------- UI SETUP ------------------------------- #
 window = Tk()
 window.title("Pomodoro")
@@ -61,11 +74,11 @@ start_button = Button(text="Start",highlightthickness=0, command=start_timer)
 start_button.config(fg="black",bg="white")
 start_button.grid(column=0,row=2)
 
-reset_button = Button(text="Reset",highlightthickness=0)
+reset_button = Button(text="Reset",highlightthickness=0, command=reset_timer)
 reset_button.config(fg="black", bg="white")
 reset_button.grid(column=2,row=2)
 
-check_mark = Label(text="✔",fg=GREEN, bg=YELLOW, font=40)
+check_mark = Label(text="",fg=GREEN, bg=YELLOW, font=40)
 check_mark.grid(column=1,row=3)
 
 window.mainloop()
